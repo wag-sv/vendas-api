@@ -32,19 +32,20 @@ export class UserResolver {
   }
 
   @Query(() => [User])
-  async users(): Promise<User[]> {
+  async getUsers(): Promise<User[]> {
     const users = await this.userService.findAll();
     return users;
   }
 
   @Query(() => User, { nullable: true })
-  async user(
-    @Args('id', { nullable: true }) id: string,
-    @Args('email', { nullable: true }) email: string,
-  ): Promise<User> {
-    let user: User;
-    if (id) user = await this.userService.findOneById(id);
-    else if (email) user = await this.userService.findOneByEmail(email);
+  async getUserById(@Args('id') id: string): Promise<User> {
+    const user = await this.userService.findOneById(id);
+    return user;
+  }
+
+  @Query(() => User, { nullable: true })
+  async getUserByEmail(@Args('email') email: string): Promise<User> {
+    const user = await this.userService.findOneByEmail(email);
     return user;
   }
 }
