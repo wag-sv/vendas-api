@@ -13,10 +13,38 @@ type AuthType {
   token: String!
 }
 
+type Product {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  sale: Sale!
+}
+
+type Sale {
+  id: ID!
+  description: String!
+  products: [Product!]!
+  totalValue: Float!
+  date: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Client {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
 type Query {
   getUsers: [User!]!
   getUserById(id: String!): User
   getUserByEmail(email: String!): User
+  sales: [Sale!]!
+  client(id: Int!): Client!
 }
 
 type Mutation {
@@ -24,6 +52,10 @@ type Mutation {
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
   removeUser(id: String!): Boolean!
   login(data: AuthInput!): AuthType!
+  createSale(saleInput: CreateSaleInput!): Sale!
+  createClient(createClientInput: CreateClientInput!): Client!
+  updateClient(updateClientInput: UpdateClientInput!): Client!
+  removeClient(id: Int!): Client!
 }
 
 input CreateUserInput {
@@ -41,4 +73,21 @@ input UpdateUserInput {
 input AuthInput {
   email: String!
   password: String!
+}
+
+input CreateSaleInput {
+  description: String!
+  date: DateTime!
+  totalValue: Float!
+}
+
+input CreateClientInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateClientInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }

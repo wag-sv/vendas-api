@@ -18,6 +18,6 @@ export class UpdateUserInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsNotEmpty({ message: 'Senha é obrigatório.' })
-  @IsString({ message: 'Senha deve ser uma string.' })
+  @IsString()
   password?: string;
 }

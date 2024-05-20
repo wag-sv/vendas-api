@@ -21,7 +21,7 @@ const getAValidUser = () => {
   };
 };
 
-describe('Serviço de Usuário', () => {
+describe('UserService', () => {
   let service: UserService;
 
   beforeAll(async () => {

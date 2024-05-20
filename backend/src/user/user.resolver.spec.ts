@@ -38,6 +38,10 @@ describe('UserResolver', () => {
     resolver = module.get<UserResolver>(UserResolver);
   });
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('deve ser definido', () => {
     expect(resolver).toBeDefined();
   });
