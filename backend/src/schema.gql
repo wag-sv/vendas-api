@@ -18,13 +18,70 @@ type Product {
   name: String!
   description: String!
   price: Float!
+  stock: Float!
+  type: ProductType!
+}
+
+enum ProductType {
+  SIMPLE
+  DIGITAL
+  CONFIGURABLE
+  GROUPED
+}
+
+type DigitalProduct {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float!
+  type: ProductType!
+  downloadLink: String!
+}
+
+type ConfigurableProduct {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float!
+  type: ProductType!
+  color: String!
+  size: String!
+}
+
+type GroupedProduct {
+  id: ID!
+  name: String!
+  description: String!
+  price: Float!
+  stock: Float!
+  type: ProductType!
+  associatedProducts: [Product!]!
+}
+
+type SaleProduct {
+  id: ID!
+  product: Product!
   sale: Sale!
+  quantity: Float!
+  unitPrice: Float!
+  totalPrice: Float!
+}
+
+type Client {
+  id: ID!
+  name: String!
+  cpf: String!
+  email: String!
+  sales: [Sale!]!
 }
 
 type Sale {
   id: ID!
   description: String!
-  products: [Product!]!
+  saleProducts: [SaleProduct!]!
+  client: Client!
   totalValue: Float!
   date: DateTime!
 }
@@ -34,17 +91,17 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Client {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 type Query {
   getUsers: [User!]!
   getUserById(id: String!): User
   getUserByEmail(email: String!): User
+  getProducts: [Product!]!
+  getProductById(id: String!): Product
   sales: [Sale!]!
-  client(id: Int!): Client!
+  sale(id: String!): Sale!
+  client(id: String!): Client!
+  clientByCpf(cpf: String!): Client!
+  clients: [Client!]!
 }
 
 type Mutation {
@@ -52,10 +109,21 @@ type Mutation {
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
   removeUser(id: String!): Boolean!
   login(data: AuthInput!): AuthType!
-  createSale(saleInput: CreateSaleInput!): Sale!
+  createProduct(createProductInput: CreateProductInput!): Product!
+  createDigitalProduct(createDigitalProductInput: CreateDigitalProductInput!): DigitalProduct!
+  createConfigurableProduct(createConfigurableProductInput: CreateConfigurableProductInput!): ConfigurableProduct!
+  createGroupedProduct(createGroupedProductInput: CreateGroupedProductInput!): GroupedProduct!
+  updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
+  updateDigitalProduct(id: String!, updateDigitalProductInput: UpdateDigitalProductInput!): DigitalProduct!
+  updateConfigurableProduct(id: String!, updateConfigurableProductInput: UpdateConfigurableProductInput!): ConfigurableProduct!
+  updateGroupedProduct(id: String!, updateGroupedProductInput: UpdateGroupedProductInput!): GroupedProduct!
+  removeProduct(id: String!): Boolean!
+  createSale(createSaleInput: CreateSaleInput!): Sale!
+  updateSale(id: String!, updateSaleInput: UpdateSaleInput!): Sale!
+  removeSale(id: String!): Boolean!
   createClient(createClientInput: CreateClientInput!): Client!
-  updateClient(updateClientInput: UpdateClientInput!): Client!
-  removeClient(id: Int!): Client!
+  updateClient(id: String!, updateClientInput: UpdateClientInput!): Client!
+  removeClient(id: String!): Boolean!
 }
 
 input CreateUserInput {
@@ -75,19 +143,95 @@ input AuthInput {
   password: String!
 }
 
+input CreateProductInput {
+  name: String!
+  description: String!
+  price: Float!
+}
+
+input CreateDigitalProductInput {
+  name: String!
+  description: String!
+  price: Float!
+  downloadLink: String!
+}
+
+input CreateConfigurableProductInput {
+  name: String!
+  description: String!
+  price: Float!
+  color: String!
+  size: String!
+}
+
+input CreateGroupedProductInput {
+  name: String!
+  description: String!
+  price: Float!
+  associatedProducts: [String!]!
+}
+
+input UpdateProductInput {
+  name: String
+  description: String
+  price: Float
+}
+
+input UpdateDigitalProductInput {
+  name: String
+  description: String
+  price: Float
+  downloadLink: String
+}
+
+input UpdateConfigurableProductInput {
+  name: String
+  description: String
+  price: Float
+  color: String
+  size: String
+}
+
+input UpdateGroupedProductInput {
+  name: String
+  description: String
+  price: Float
+  associatedProducts: [String!]
+}
+
 input CreateSaleInput {
   description: String!
-  date: DateTime!
+  saleProducts: [CreateSaleProductInput!]!
   totalValue: Float!
+  date: DateTime!
+  clientId: String!
+}
+
+input CreateSaleProductInput {
+  productId: String!
+  quantity: Float!
+}
+
+input UpdateSaleInput {
+  description: String
+  saleProducts: [UpdateSaleProductInput!]
+  totalValue: Float
+  date: DateTime
+  clientId: String
+}
+
+input UpdateSaleProductInput {
+  productId: String!
+  quantity: Float!
 }
 
 input CreateClientInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  name: String!
+  cpf: String!
+  email: String!
 }
 
 input UpdateClientInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  name: String
+  email: String
 }

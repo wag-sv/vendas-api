@@ -1,8 +1,8 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 @InputType()
-export class UpdateUserInput {
+export class UpdateClientInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
@@ -12,9 +12,4 @@ export class UpdateUserInput {
   @IsOptional()
   @IsEmail({}, { message: 'Email inválido.' })
   email?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  password?: string;
 }

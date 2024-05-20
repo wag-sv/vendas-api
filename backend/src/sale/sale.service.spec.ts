@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SaleService } from './sale.service';
-import { Sale } from './sale.entity';
+import { Sale } from './entities/sale.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TestUtils } from 'src/commom/test/TestUtils';
 

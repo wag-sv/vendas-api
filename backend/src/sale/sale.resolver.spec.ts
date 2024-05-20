@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SaleResolver } from './sale.resolver';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Sale } from './sale.entity';
+import { Sale } from './entities/sale.entity';
 import { SaleService } from './sale.service';
 import { TestUtils } from 'src/commom/test/TestUtils';
 

@@ -4,7 +4,7 @@ import { AuthInput } from './dto/auth.input';
 import { compareSync } from 'bcrypt';
 import { AuthType } from './dto/auth.type';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {

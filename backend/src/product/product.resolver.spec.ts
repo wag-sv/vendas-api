@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductResolver } from './product.resolver';
 import { ProductService } from './product.service';
-import { Product } from './product.entity';
+import { Product } from './entities/product.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TestUtils } from 'src/commom/test/TestUtils';
 

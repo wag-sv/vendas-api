@@ -1,25 +1,40 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Product } from 'src/product/product.entity';
+import { InputType, Field } from '@nestjs/graphql';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsDate,
+  IsUUID,
+  ArrayMinSize,
+  IsArray,
+} from 'class-validator';
+import { UpdateSaleProductInput } from './update-sale-product.input';
 
 @InputType()
 export class UpdateSaleInput {
   @Field({ nullable: true })
-  @IsNotEmpty({ message: 'Descrição é obrigatória.' })
+  @IsOptional()
   @IsString()
   description?: string;
 
-  @Field(() => [Product], { nullable: true })
-  @IsNotEmpty({ message: 'Produtos são obrigatórios.' })
-  products?: Product[];
+  @Field(() => [UpdateSaleProductInput], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayMinSize(1, { message: 'A venda deve ter pelo menos um produto.' })
+  saleProducts?: UpdateSaleProductInput[];
 
   @Field({ nullable: true })
-  @IsNotEmpty({ message: 'Valor total é obrigatório.' })
+  @IsOptional()
   @IsNumber()
   totalValue?: number;
 
   @Field(() => Date, { nullable: true })
-  @IsNotEmpty({ message: 'Data é obrigatória.' })
+  @IsOptional()
   @IsDate({ message: 'Data inválida.' })
   date?: Date;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsUUID()
+  clientId?: string;
 }
