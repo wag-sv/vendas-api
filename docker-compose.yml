@@ -13,20 +13,20 @@ services:
       POSTGRES_USER: vendas_db_user
       POSTGRES_PASSWORD: vendas_db_password
 
-  backend:
-    build: ./backend
+  api:
+    build: .
     image: vendas_api_image
     container_name: vendas_api
     command: npm run start:dev
     ports:
       - 3000:3000
     volumes:
-      - ./backend:/app
+      - .:/app
       - /app/node_modules
     depends_on:
       - db
     env_file:
-      - ./backend/.env.development
+      - .env.development
 
 volumes:
   db_data:

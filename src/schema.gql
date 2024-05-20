@@ -69,7 +69,7 @@ type SaleProduct {
   totalPrice: Float!
 }
 
-type Client {
+type Customer {
   id: ID!
   name: String!
   cpf: String!
@@ -81,7 +81,7 @@ type Sale {
   id: ID!
   description: String!
   saleProducts: [SaleProduct!]!
-  client: Client!
+  customer: Customer!
   totalValue: Float!
   date: DateTime!
 }
@@ -99,16 +99,16 @@ type Query {
   getProductById(id: String!): Product
   sales: [Sale!]!
   sale(id: String!): Sale!
-  client(id: String!): Client!
-  clientByCpf(cpf: String!): Client!
-  clients: [Client!]!
+  findOne(id: String!): Customer!
+  findOneByCpf(cpf: String!): Customer!
+  findAll: [Customer!]!
 }
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
   removeUser(id: String!): Boolean!
-  login(data: AuthInput!): AuthType!
+  login(loginInput: AuthInput!): AuthType!
   createProduct(createProductInput: CreateProductInput!): Product!
   createDigitalProduct(createDigitalProductInput: CreateDigitalProductInput!): DigitalProduct!
   createConfigurableProduct(createConfigurableProductInput: CreateConfigurableProductInput!): ConfigurableProduct!
@@ -121,9 +121,9 @@ type Mutation {
   createSale(createSaleInput: CreateSaleInput!): Sale!
   updateSale(id: String!, updateSaleInput: UpdateSaleInput!): Sale!
   removeSale(id: String!): Boolean!
-  createClient(createClientInput: CreateClientInput!): Client!
-  updateClient(id: String!, updateClientInput: UpdateClientInput!): Client!
-  removeClient(id: String!): Boolean!
+  createCustomer(createCustomertInput: CreateCustomerInput!): Customer!
+  updateCustomer(id: String!, updateCustomertInput: UpdateCustomerInput!): Customer!
+  removeCustomer(id: String!): Boolean!
 }
 
 input CreateUserInput {
@@ -204,7 +204,7 @@ input CreateSaleInput {
   saleProducts: [CreateSaleProductInput!]!
   totalValue: Float!
   date: DateTime!
-  clientId: String!
+  customerId: String!
 }
 
 input CreateSaleProductInput {
@@ -217,7 +217,7 @@ input UpdateSaleInput {
   saleProducts: [UpdateSaleProductInput!]
   totalValue: Float
   date: DateTime
-  clientId: String
+  customerId: String
 }
 
 input UpdateSaleProductInput {
@@ -225,13 +225,13 @@ input UpdateSaleProductInput {
   quantity: Float!
 }
 
-input CreateClientInput {
+input CreateCustomerInput {
   name: String!
   cpf: String!
   email: String!
 }
 
-input UpdateClientInput {
+input UpdateCustomerInput {
   name: String
   email: String
 }

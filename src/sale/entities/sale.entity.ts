@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { SaleProduct } from './sale-product.entity';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Client } from 'src/client/entities/client.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
 
 @ObjectType()
 @Entity()
@@ -26,9 +26,9 @@ export class Sale {
   })
   saleProducts: SaleProduct[];
 
-  @Field(() => Client)
-  @ManyToOne(() => Client, (client) => client.sales)
-  client: Client;
+  @Field(() => Customer)
+  @ManyToOne(() => Customer, (customer) => customer.sales)
+  customer: Customer;
 
   @Field()
   @Column()

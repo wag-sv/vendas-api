@@ -8,8 +8,8 @@ export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
   @Mutation(() => AuthType)
-  async login(@Args('data') data: AuthInput): Promise<AuthType> {
-    const response = await this.authService.validateUser(data);
+  async login(@Args('loginInput') loginInput: AuthInput): Promise<AuthType> {
+    const response = await this.authService.validateUser(loginInput);
     return { user: response.user, token: response.token };
   }
 }

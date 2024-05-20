@@ -4,7 +4,7 @@ import { Sale } from 'src/sale/entities/sale.entity';
 
 @ObjectType()
 @Entity()
-export class Client {
+export class Customer {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -22,6 +22,6 @@ export class Client {
   email: string;
 
   @Field(() => [Sale])
-  @OneToMany(() => Sale, (sale) => sale.client)
+  @OneToMany(() => Sale, (sale) => sale.customer)
   sales: Sale[];
 }

@@ -36,5 +36,5 @@ export class UpdateSaleInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsUUID()
-  clientId?: string;
+  customerId?: string;
 }

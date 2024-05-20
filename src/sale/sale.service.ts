@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Sale } from './entities/sale.entity';
 import { SaleProduct } from './entities/sale-product.entity';
-import { Client } from '../client/entities/client.entity';
+import { Customer } from '../customer/entities/customer.entity';
 import { CreateSaleInput } from './dto/create-sale.input';
 import { UpdateSaleInput } from './dto/update-sale.input';
 import { ProductService } from '../product/product.service';
@@ -21,15 +21,15 @@ export class SaleService {
     private saleRepository: Repository<Sale>,
     @InjectRepository(SaleProduct)
     private saleProductRepository: Repository<SaleProduct>,
-    @InjectRepository(Client)
-    private clientRepository: Repository<Client>,
+    @InjectRepository(Customer)
+    private clientRepository: Repository<Customer>,
     private readonly productService: ProductService,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
   ) {}
 
   async create(createSaleInput: CreateSaleInput): Promise<Sale> {
-    const { saleProducts, clientId, ...saleData } = createSaleInput;
+    const { saleProducts, customerId, ...saleData } = createSaleInput;
 
     try {
       if (saleProducts.length < 1) {
@@ -38,15 +38,15 @@ export class SaleService {
         );
       }
 
-      const client = await this.clientRepository.findOne({
-        where: { id: clientId },
+      const customer = await this.clientRepository.findOne({
+        where: { id: customerId },
       });
 
-      if (!client) {
+      if (!customer) {
         throw new InternalServerErrorException('Cliente não encontrado.');
       }
 
-      if (!cpf.isValid(client.cpf)) {
+      if (!cpf.isValid(customer.cpf)) {
         throw new BadRequestException('CPF do cliente é inválido.');
       }
 
@@ -64,7 +64,7 @@ export class SaleService {
         }
       }
 
-      const sale = this.saleRepository.create({ ...saleData, client });
+      const sale = this.saleRepository.create({ ...saleData, customer });
 
       sale.saleProducts = await Promise.all(
         saleProducts.map(async (saleProductInput) => {
@@ -96,29 +96,29 @@ export class SaleService {
   }
 
   async update(id: string, updateSaleInput: UpdateSaleInput): Promise<Sale> {
-    const { saleProducts, clientId, ...saleData } = updateSaleInput;
+    const { saleProducts, customerId, ...saleData } = updateSaleInput;
 
     try {
       const sale = await this.saleRepository.findOne({
         where: { id },
-        relations: ['saleProducts', 'client'],
+        relations: ['saleProducts', 'customer'],
       });
 
       if (!sale) {
         throw new InternalServerErrorException('Venda não encontrada.');
       }
 
-      if (clientId) {
-        const client = await this.clientRepository.findOne({
-          where: { id: clientId },
+      if (customerId) {
+        const customer = await this.clientRepository.findOne({
+          where: { id: customerId },
         });
-        if (!client) {
+        if (!customer) {
           throw new InternalServerErrorException('Cliente não encontrado.');
         }
-        if (!cpf.isValid(client.cpf)) {
+        if (!cpf.isValid(customer.cpf)) {
           throw new BadRequestException('CPF do cliente é inválido.');
         }
-        sale.client = client;
+        sale.customer = customer;
       }
 
       Object.assign(sale, saleData);

@@ -36,5 +36,5 @@ export class CreateSaleInput {
   @Field()
   @IsNotEmpty({ message: 'ID do cliente é obrigatório.' })
   @IsUUID()
-  clientId: string;
+  customerId: string;
 }
