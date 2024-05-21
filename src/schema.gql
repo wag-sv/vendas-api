@@ -19,14 +19,7 @@ type Product {
   description: String!
   price: Float!
   stock: Float!
-  type: ProductType!
-}
-
-enum ProductType {
-  SIMPLE
-  DIGITAL
-  CONFIGURABLE
-  GROUPED
+  type: String!
 }
 
 type DigitalProduct {
@@ -35,7 +28,7 @@ type DigitalProduct {
   description: String!
   price: Float!
   stock: Float!
-  type: ProductType!
+  type: String!
   downloadLink: String!
 }
 
@@ -45,7 +38,7 @@ type ConfigurableProduct {
   description: String!
   price: Float!
   stock: Float!
-  type: ProductType!
+  type: String!
   color: String!
   size: String!
 }
@@ -56,7 +49,7 @@ type GroupedProduct {
   description: String!
   price: Float!
   stock: Float!
-  type: ProductType!
+  type: String!
   associatedProducts: [Product!]!
 }
 
@@ -97,11 +90,10 @@ type Query {
   getUserByEmail(email: String!): User
   getProducts: [Product!]!
   getProductById(id: String!): Product
-  sales: [Sale!]!
-  sale(id: String!): Sale!
+  getSales: [Sale!]!
   findOne(id: String!): Customer!
   findOneByCpf(cpf: String!): Customer!
-  findAll: [Customer!]!
+  getCustomers: [Customer!]!
 }
 
 type Mutation {
@@ -147,12 +139,14 @@ input CreateProductInput {
   name: String!
   description: String!
   price: Float!
+  stock: Float!
 }
 
 input CreateDigitalProductInput {
   name: String!
   description: String!
   price: Float!
+  stock: Float!
   downloadLink: String!
 }
 
@@ -160,6 +154,7 @@ input CreateConfigurableProductInput {
   name: String!
   description: String!
   price: Float!
+  stock: Float!
   color: String!
   size: String!
 }
@@ -168,6 +163,7 @@ input CreateGroupedProductInput {
   name: String!
   description: String!
   price: Float!
+  stock: Float!
   associatedProducts: [String!]!
 }
 
@@ -175,12 +171,14 @@ input UpdateProductInput {
   name: String
   description: String
   price: Float
+  stock: Float
 }
 
 input UpdateDigitalProductInput {
   name: String
   description: String
   price: Float
+  stock: Float
   downloadLink: String
 }
 
@@ -188,6 +186,7 @@ input UpdateConfigurableProductInput {
   name: String
   description: String
   price: Float
+  stock: Float
   color: String
   size: String
 }
@@ -196,13 +195,13 @@ input UpdateGroupedProductInput {
   name: String
   description: String
   price: Float
+  stock: Float
   associatedProducts: [String!]
 }
 
 input CreateSaleInput {
   description: String!
   saleProducts: [CreateSaleProductInput!]!
-  totalValue: Float!
   date: DateTime!
   customerId: String!
 }
@@ -215,7 +214,6 @@ input CreateSaleProductInput {
 input UpdateSaleInput {
   description: String
   saleProducts: [UpdateSaleProductInput!]
-  totalValue: Float
   date: DateTime
   customerId: String
 }

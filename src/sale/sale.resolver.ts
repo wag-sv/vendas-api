@@ -3,7 +3,10 @@ import { SaleService } from './sale.service';
 import { Sale } from './entities/sale.entity';
 import { CreateSaleInput } from './dto/create-sale.input';
 import { UpdateSaleInput } from './dto/update-sale.input';
+import { GqlAuthGuard } from 'src/auth/auth.guard';
+import { UseGuards } from '@nestjs/common';
 
+@UseGuards(GqlAuthGuard)
 @Resolver(() => Sale)
 export class SaleResolver {
   constructor(private saleService: SaleService) {}
@@ -28,12 +31,12 @@ export class SaleResolver {
     return this.saleService.remove(id);
   }
 
-  @Query(() => [Sale], { name: 'sales' })
-  async findAll(): Promise<Sale[]> {
+  @Query(() => [Sale])
+  async getSales(): Promise<Sale[]> {
     return this.saleService.findAll();
   }
 
-  @Query(() => Sale, { name: 'sale' })
+  @Query(() => Sale)
   async findOne(@Args('id') id: string): Promise<Sale> {
     return this.saleService.findOneById(id);
   }

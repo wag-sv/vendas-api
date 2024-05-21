@@ -12,7 +12,6 @@ import {
   ConfigurableProduct,
   GroupedProduct,
 } from './entities/product.entity';
-import { ProductType } from './entities/product-type.enum';
 import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { CreateDigitalProductInput } from './dto/create-digital-product.input';
@@ -27,13 +26,19 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(DigitalProduct)
+    private readonly digitalProductRepository: Repository<DigitalProduct>,
+    @InjectRepository(ConfigurableProduct)
+    private readonly configurableProductRepository: Repository<ConfigurableProduct>,
+    @InjectRepository(GroupedProduct)
+    private readonly groupedProductRepository: Repository<GroupedProduct>,
   ) {}
 
   async create(createProductInput: CreateProductInput): Promise<Product> {
     try {
       const product = this.productRepository.create({
         ...createProductInput,
-        type: ProductType.SIMPLE,
+        type: 'SIMPLE',
       });
       return await this.productRepository.save(product);
     } catch (error) {
@@ -52,11 +57,11 @@ export class ProductService {
         throw new BadRequestException('O link para download é obrigatório.');
       }
 
-      const digitalProduct = this.productRepository.create({
+      const digitalProduct = this.digitalProductRepository.create({
         ...createDigitalProductInput,
-        type: ProductType.DIGITAL,
+        type: 'DIGITAL',
       }) as DigitalProduct;
-      return await this.productRepository.save(digitalProduct);
+      return await this.digitalProductRepository.save(digitalProduct);
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Nome do produto digital já existe.');
@@ -80,11 +85,11 @@ export class ProductService {
         );
       }
 
-      const configurableProduct = this.productRepository.create({
+      const configurableProduct = this.configurableProductRepository.create({
         ...createConfigurableProductInput,
-        type: ProductType.CONFIGURABLE,
+        type: 'CONFIGURABLE',
       }) as ConfigurableProduct;
-      return await this.productRepository.save(configurableProduct);
+      return await this.configurableProductRepository.save(configurableProduct);
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Nome do produto configurável já existe.');
@@ -99,17 +104,23 @@ export class ProductService {
     createGroupedProductInput: CreateGroupedProductInput,
   ): Promise<GroupedProduct> {
     try {
-      if (createGroupedProductInput.associatedProducts.length < 2) {
+      const associatedProducts = await this.productRepository.findByIds(
+        createGroupedProductInput.associatedProducts,
+      );
+
+      if (associatedProducts.length < 2) {
         throw new BadRequestException(
           'O produto agrupado deve ter pelo menos dois produtos associados.',
         );
       }
 
-      const groupedProduct = this.productRepository.create({
+      const groupedProduct = this.groupedProductRepository.create({
         ...createGroupedProductInput,
-        type: ProductType.GROUPED,
-      }) as GroupedProduct;
-      return await this.productRepository.save(groupedProduct);
+        associatedProducts,
+        type: 'GROUPED',
+      });
+
+      return await this.groupedProductRepository.save(groupedProduct);
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Nome do produto agrupado já existe.');
@@ -145,9 +156,9 @@ export class ProductService {
         throw new BadRequestException('O link para download é obrigatório.');
       }
 
-      await this.productRepository.update(id, updateDigitalProductInput);
-      const digitalProduct = (await this.productRepository.findOne({
-        where: { id, type: ProductType.DIGITAL },
+      await this.digitalProductRepository.update(id, updateDigitalProductInput);
+      const digitalProduct = (await this.digitalProductRepository.findOne({
+        where: { id },
       })) as DigitalProduct;
       return digitalProduct;
     } catch (error) {
@@ -174,10 +185,14 @@ export class ProductService {
         );
       }
 
-      await this.productRepository.update(id, updateConfigurableProductInput);
-      const configurableProduct = (await this.productRepository.findOne({
-        where: { id, type: ProductType.CONFIGURABLE },
-      })) as ConfigurableProduct;
+      await this.configurableProductRepository.update(
+        id,
+        updateConfigurableProductInput,
+      );
+      const configurableProduct =
+        (await this.configurableProductRepository.findOne({
+          where: { id },
+        })) as ConfigurableProduct;
       return configurableProduct;
     } catch (error) {
       if (error.code === '23505') {
@@ -203,9 +218,27 @@ export class ProductService {
         );
       }
 
-      await this.productRepository.update(id, updateGroupedProductInput);
-      const groupedProduct = (await this.productRepository.findOne({
-        where: { id, type: ProductType.GROUPED },
+      let associatedProducts;
+      if (updateGroupedProductInput.associatedProducts) {
+        associatedProducts = await this.productRepository.findByIds(
+          updateGroupedProductInput.associatedProducts,
+        );
+
+        if (associatedProducts.length < 2) {
+          throw new BadRequestException(
+            'O produto agrupado deve ter pelo menos dois produtos associados.',
+          );
+        }
+      }
+
+      const partialUpdate: Partial<GroupedProduct> = {
+        ...updateGroupedProductInput,
+        associatedProducts: associatedProducts ? associatedProducts : undefined,
+      };
+
+      await this.groupedProductRepository.update(id, partialUpdate);
+      const groupedProduct = (await this.groupedProductRepository.findOne({
+        where: { id },
       })) as GroupedProduct;
       return groupedProduct;
     } catch (error) {

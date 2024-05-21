@@ -2,19 +2,18 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  TableInheritance,
-  ChildEntity,
   ManyToMany,
   JoinTable,
   Unique,
+  ChildEntity,
+  TableInheritance,
 } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { ProductType } from './product-type.enum';
 
 @ObjectType()
 @Entity()
-@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 @Unique(['name'])
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export class Product {
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
@@ -36,13 +35,13 @@ export class Product {
   @Column()
   stock: number;
 
-  @Field(() => ProductType)
-  @Column({ type: 'enum', enum: ProductType })
-  type: ProductType;
+  @Field()
+  @Column()
+  type: string;
 }
 
 @ObjectType()
-@ChildEntity(ProductType.DIGITAL)
+@ChildEntity('DIGITAL')
 export class DigitalProduct extends Product {
   @Field()
   @Column()
@@ -50,7 +49,7 @@ export class DigitalProduct extends Product {
 }
 
 @ObjectType()
-@ChildEntity(ProductType.CONFIGURABLE)
+@ChildEntity('CONFIGURABLE')
 export class ConfigurableProduct extends Product {
   @Field()
   @Column()
@@ -62,7 +61,7 @@ export class ConfigurableProduct extends Product {
 }
 
 @ObjectType()
-@ChildEntity(ProductType.GROUPED)
+@ChildEntity('GROUPED')
 export class GroupedProduct extends Product {
   @Field(() => [Product])
   @ManyToMany(() => Product)

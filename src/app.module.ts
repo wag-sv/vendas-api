@@ -32,6 +32,6 @@ import { CustomerModule } from './customer/customer.module';
     SaleModule,
     CustomerModule,
   ],
-  providers: [],
+  exports: [],
 })
 export class AppModule {}

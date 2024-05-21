@@ -50,19 +50,7 @@ export class SaleService {
         throw new BadRequestException('CPF do cliente é inválido.');
       }
 
-      for (const saleProductInput of saleProducts) {
-        const product = await this.productService.findOneById(
-          saleProductInput.productId,
-        );
-        if (!product) {
-          throw new InternalServerErrorException('Produto não encontrado.');
-        }
-        if (product.stock < saleProductInput.quantity) {
-          throw new BadRequestException(
-            `Estoque insuficiente para o produto ${product.name}. Quantidade disponível: ${product.stock}, Quantidade solicitada: ${saleProductInput.quantity}.`,
-          );
-        }
-      }
+      let totalValue = 0;
 
       const sale = this.saleRepository.create({ ...saleData, customer });
 
@@ -75,6 +63,12 @@ export class SaleService {
             throw new InternalServerErrorException('Produto não encontrado.');
           }
 
+          if (product.stock < saleProductInput.quantity) {
+            throw new BadRequestException(
+              `Estoque insuficiente para o produto ${product.name}. Quantidade disponível: ${product.stock}, Quantidade solicitada: ${saleProductInput.quantity}.`,
+            );
+          }
+
           product.stock -= saleProductInput.quantity;
           await this.productRepository.save(product);
 
@@ -85,13 +79,20 @@ export class SaleService {
           saleProduct.totalPrice = saleProductInput.quantity * product.price;
           saleProduct.sale = sale;
 
+          totalValue += saleProduct.totalPrice;
+
           return saleProduct;
         }),
       );
 
+      sale.totalValue = totalValue;
+
       return await this.saleRepository.save(sale);
     } catch (error) {
-      throw new InternalServerErrorException('Falha ao criar a venda.');
+      throw new InternalServerErrorException(
+        'Falha ao criar a venda.',
+        error.message,
+      );
     }
   }
 
@@ -101,7 +102,7 @@ export class SaleService {
     try {
       const sale = await this.saleRepository.findOne({
         where: { id },
-        relations: ['saleProducts', 'customer'],
+        relations: ['saleProducts', 'saleProducts.product', 'customer'],
       });
 
       if (!sale) {
@@ -145,14 +146,19 @@ export class SaleService {
         }
 
         for (const saleProduct of sale.saleProducts) {
-          const product = await this.productService.findOneById(
-            saleProduct.product.id,
-          );
+          const product = saleProduct.product;
+          if (!product) {
+            throw new InternalServerErrorException(
+              'Produto não encontrado durante a atualização de estoque.',
+            );
+          }
           product.stock += saleProduct.quantity;
           await this.productRepository.save(product);
         }
 
         await this.saleProductRepository.delete({ sale });
+
+        let totalValue = 0;
 
         sale.saleProducts = await Promise.all(
           saleProducts.map(async (saleProductInput) => {
@@ -173,13 +179,21 @@ export class SaleService {
             saleProduct.totalPrice = saleProductInput.quantity * product.price;
             saleProduct.sale = sale;
 
+            totalValue += saleProduct.totalPrice;
+
             return saleProduct;
           }),
         );
+
+        sale.totalValue = totalValue;
       }
 
       return await this.saleRepository.save(sale);
     } catch (error) {
+      console.error('Erro ao atualizar a venda:', error.message);
+      if (error instanceof InternalServerErrorException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Falha ao atualizar a venda.');
     }
   }
@@ -199,6 +213,7 @@ export class SaleService {
         const product = await this.productService.findOneById(
           saleProduct.product.id,
         );
+
         product.stock += saleProduct.quantity;
         await this.productRepository.save(product);
       }
@@ -213,7 +228,7 @@ export class SaleService {
   async findAll(): Promise<Sale[]> {
     try {
       return await this.saleRepository.find({
-        relations: ['saleProducts', 'saleProducts.product', 'client'],
+        relations: ['saleProducts', 'saleProducts.product', 'customer'],
       });
     } catch (error) {
       throw new InternalServerErrorException('Falha ao buscar as vendas.');
@@ -224,7 +239,7 @@ export class SaleService {
     try {
       return await this.saleRepository.findOne({
         where: { id },
-        relations: ['saleProducts', 'saleProducts.product', 'client'],
+        relations: ['saleProducts', 'saleProducts.product', 'customer'],
       });
     } catch (error) {
       throw new InternalServerErrorException('Falha ao buscar a venda.');

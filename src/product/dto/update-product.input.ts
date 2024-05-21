@@ -17,4 +17,9 @@ export class UpdateProductInput {
   @IsOptional()
   @IsNumber()
   price?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsNumber()
+  stock?: number;
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -8,6 +9,7 @@ import { Repository } from 'typeorm';
 import { Customer } from './entities/customer.entity';
 import { CreateCustomerInput } from './dto/create-customer.input';
 import { UpdateCustomerInput } from './dto/update-customer.input';
+import { cpf } from 'cpf-cnpj-validator';
 
 @Injectable()
 export class CustomerService {
@@ -17,6 +19,10 @@ export class CustomerService {
   ) {}
 
   async create(createCustomerInput: CreateCustomerInput): Promise<Customer> {
+    if (!cpf.isValid(createCustomerInput.cpf)) {
+      throw new BadRequestException('CPF do cliente é inválido.');
+    }
+
     const customer = this.customerRepository.create(createCustomerInput);
     try {
       return await this.customerRepository.save(customer);

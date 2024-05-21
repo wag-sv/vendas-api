@@ -8,12 +8,6 @@ import {
   ConfigurableProduct,
   GroupedProduct,
 } from './entities/product.entity';
-import { ProductType } from './entities/product-type.enum';
-import { registerEnumType } from '@nestjs/graphql';
-
-registerEnumType(ProductType, {
-  name: 'ProductType',
-});
 
 @Module({
   imports: [

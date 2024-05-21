@@ -2,7 +2,6 @@ import { InputType, Field } from '@nestjs/graphql';
 import {
   IsOptional,
   IsString,
-  IsNumber,
   IsDate,
   IsUUID,
   ArrayMinSize,
@@ -22,11 +21,6 @@ export class UpdateSaleInput {
   @IsArray()
   @ArrayMinSize(1, { message: 'A venda deve ter pelo menos um produto.' })
   saleProducts?: UpdateSaleProductInput[];
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsNumber()
-  totalValue?: number;
 
   @Field(() => Date, { nullable: true })
   @IsOptional()

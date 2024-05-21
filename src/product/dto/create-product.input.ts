@@ -17,4 +17,9 @@ export class CreateProductInput {
   @IsNotEmpty({ message: 'Preço é obrigatório.' })
   @IsNumber()
   price: number;
+
+  @Field()
+  @IsNotEmpty({ message: 'Estoque é obrigatório.' })
+  @IsNumber()
+  stock: number;
 }

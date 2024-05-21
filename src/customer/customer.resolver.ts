@@ -3,7 +3,10 @@ import { CustomerService } from './customer.service';
 import { CreateCustomerInput } from './dto/create-customer.input';
 import { UpdateCustomerInput } from './dto/update-customer.input';
 import { Customer } from './entities/customer.entity';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(GqlAuthGuard)
 @Resolver(() => Customer)
 export class CustomerResolver {
   constructor(private readonly customerService: CustomerService) {}
@@ -39,7 +42,7 @@ export class CustomerResolver {
   }
 
   @Query(() => [Customer])
-  async findAll(): Promise<Customer[]> {
+  async getCustomers(): Promise<Customer[]> {
     return this.customerService.findAll();
   }
 }

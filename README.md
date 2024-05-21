@@ -69,6 +69,14 @@ mutation {
 }
 ```
 
+#### Enviar Token nas Requisições Protegidas
+
+Para acessar as rotas protegidas, você deve incluir o token JWT obtido na autenticação como parte do cabeçalho de suas requisições. Adicione o seguinte cabeçalho às suas requisições GraphQL:
+
+```
+Authorization: Bearer <Seu Token JWT aqui>
+```
+
 ### Passo 5: Cadastrar Clientes
 
 Com o token JWT obtido na autenticação, você pode agora cadastrar um cliente.
@@ -79,7 +87,7 @@ Com o token JWT obtido na autenticação, você pode agora cadastrar um cliente.
 mutation {
   createCustomer(createCustomertInput: {
     name: "Cliente Teste",
-    cpf: "123.456.789-00",
+    cpf: "264.850.930-52",
     email: "cliente.teste@email.com"
   }) {
     id
@@ -204,7 +212,7 @@ query {
 
 ```graphql
 query {
-  getClients {
+  getCustomers {
     id
     name
     cpf
@@ -223,21 +231,21 @@ Utilize os IDs dos produtos e do cliente criados para registrar uma venda.
 mutation {
   createSale(createSaleInput: {
     description: "Venda de exemplo",
-    totalValue: 500.0,
     date: "2024-05-20",
-    clientId: "<ID do Cliente>",
+    customerId: "<ID do Cliente>",
     saleProducts: [
       { productId: "<ID do Produto 1>", quantity: 2 },
       { productId: "<ID do Produto 2>", quantity: 3 }
     ]
   }) {
     id
+    date
     description
     totalValue
-    date
-    client {
-      id
+    customer {
       name
+      cpf
+      email
     }
     saleProducts {
       product {
@@ -265,7 +273,7 @@ query {
     description
     totalValue
     date
-    client {
+    customer {
       id
       name
     }
@@ -309,9 +317,7 @@ mutation {
 
 ```graphql
 mutation {
-  removeProduct(id: "<ID do Produto>") {
-    success
-  }
+  removeProduct(id: "<ID do Produto>")
 }
 ```
 
@@ -319,7 +325,7 @@ mutation {
 
 ```graphql
 mutation {
-  updateClient(id: "<ID do Cliente>", updateClientInput: {
+  updateCustomer(id: "<ID do Cliente>", updateCustomertInput: {
     name: "Novo Nome do Cliente",
     email: "novoemail@example.com"
   }) {
@@ -335,9 +341,7 @@ mutation {
 
 ```graphql
 mutation {
-  removeClient(id: "<ID do Cliente>") {
-    success
-  }
+  removeCustomer(id: "<ID do Cliente>")
 }
 ```
 
@@ -345,21 +349,24 @@ mutation {
 
 ```graphql
 mutation {
-  updateSale(id: "<ID da Venda>", updateSaleInput: {
+  updateSale(id: "<ID da Venda>", 
+  updateSaleInput: {
     description: "Nova descrição da venda",
-    totalValue: 600.0,
+    date: "2024-05-20",
+    customerId: "<ID do Cliente>",
     saleProducts: [
-      { productId: "<ID do Produto 1>", quantity: 1 },
-      { productId: "<ID do Produto 2>", quantity: 4 }
+      { productId: "<ID do Produto 1>", quantity: 2 },
+      { productId: "<ID do Produto 2>", quantity: 3 }
     ]
   }) {
     id
+    date
     description
     totalValue
-    date
-    client {
-      id
+    customer {
       name
+      cpf
+      email
     }
     saleProducts {
       product {
@@ -378,10 +385,19 @@ mutation {
 
 ```graphql
 mutation {
-  removeSale(id: "<ID da Venda>") {
-    success
-  }
+  removeSale(id: "<ID da Venda>")
 }
+```
+
+### Observação
+
+Algumas deleções podem não ocorrer caso haja relacionamentos entre entidades no banco de dados.
+
+### Testes
+
+Alguns testes unitários foram criados no módulo user apenas para demonstração do conhecimento. Para executar os testes utilize o comando abaixo:
+```
+npm run test
 ```
 
 ### Conclusão

@@ -7,12 +7,25 @@ import { SaleProduct } from './entities/sale-product.entity';
 import { ProductModule } from '../product/product.module';
 import { CustomerModule } from 'src/customer/customer.module';
 import { Customer } from 'src/customer/entities/customer.entity';
-import { Product } from 'src/product/entities/product.entity';
+import {
+  ConfigurableProduct,
+  DigitalProduct,
+  GroupedProduct,
+  Product,
+} from 'src/product/entities/product.entity';
 import { ProductService } from 'src/product/product.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Sale, SaleProduct, Customer, Product]),
+    TypeOrmModule.forFeature([
+      Sale,
+      SaleProduct,
+      Customer,
+      Product,
+      DigitalProduct,
+      ConfigurableProduct,
+      GroupedProduct,
+    ]),
     ProductModule,
     CustomerModule,
   ],
